@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>c:</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-papQh2vVw0HkeWlq9C8YpL6hK7x0PmF4rN6K74vXW2/t2P9F+bjWcqENy7kpYevcWx+0O/UP9Tbwqdr6l0F0g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #000;
+            color: #fff;
+        }
+
+        /* Login Screen */
+        #loginScreen {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%;
+            height: 100%;
+            background: #111;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            flex-direction: column;
+        }
+
+        #loginScreen h1 {
+            margin-bottom: 30px;
+            color: #4CAF50;
+            text-shadow: 2px 2px 10px rgba(76, 175, 80, 0.7);
+        }
+
+        #loginForm {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 300px;
+        }
+
+        #loginForm input {
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+
+        #loginForm button {
+            padding: 10px;
+            background: #4CAF50;
+            border: none;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            color: #000;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        #loginForm button:hover {
+            background: #45a049;
+        }
+
+        /* Portfolio sections hidden initially */
+        section {
+            display: none;
+            padding: 100px 20px;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        section.active {
+            display: block;
+            opacity: 1;
+        }
+
+        nav {
+            display: flex;
+            justify-content: center;
+            background: #111;
+            padding: 10px 0;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        nav button {
+            background: none;
+            border: 2px solid #fff;
+            color: #fff;
+            padding: 10px 20px;
+            margin: 0 10px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: 0.3s;
+        }
+
+        nav button:hover,
+        nav button.active {
+            background: #fff;
+            color: #000;
+        }
+
+        h1 {
+            font-size: 3em;
+            margin-bottom: 20px;
+        }
+
+        .name-highlight {
+            color: #4CAF50;
+            text-shadow: 2px 2px 4px rgba(76, 175, 80, 0.5);
+        }
+
+        /* Avatar Styles */
+        .hero-container { display: flex; flex-direction: column; align-items: center; margin-bottom: 40px; }
+        .avatar-container { margin-bottom: 30px; position: relative; }
+        .avatar { width: 200px; height: 200px; border-radius: 50%; border: 5px solid #4CAF50; box-shadow: 0 0 30px rgba(76,175,80,0.5); object-fit: cover; cursor: pointer; transition: all 0.3s ease; animation: avatarGlow 3s ease-in-out infinite alternate; }
+        .avatar:hover { transform: scale(1.05); box-shadow: 0 0 40px rgba(76,175,80,0.8); }
+        #about .about-avatar { width: 150px; height: 150px; border-radius: 50%; border: 4px solid #4CAF50; box-shadow: 0 0 20px rgba(76,175,80,0.5); object-fit: cover; margin-bottom: 20px; animation: avatarGlow 3s ease-in-out infinite alternate; cursor: pointer; }
+        @keyframes avatarGlow { from { box-shadow:0 0 20px rgba(76,175,80,0.5);} to { box-shadow:0 0 35px rgba(76,175,80,0.8); } }
+
+        .name-title { font-size: 2.5em; font-weight: bold; color: #4CAF50; text-shadow: 2px 2px 8px rgba(76,175,80,0.5); margin-bottom: 10px; animation: textGlow 2s ease-in-out infinite alternate; }
+        @keyframes textGlow { from {text-shadow:2px 2px 8px rgba(76,175,80,0.5);} to {text-shadow:2px 2px 15px rgba(76,175,80,0.8);} }
+
+        .title-subtitle { font-size: 1.3em; color: #ccc; font-style: italic; margin-bottom: 30px; }
+        .intro-text { font-size: 1.2em; line-height: 1.6; max-width: 800px; margin: 0 auto 40px auto; color: #ddd; }
+
+        .photos-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px,1fr)); gap: 20px; max-width:1200px; margin:40px auto; }
+        .photo-card { background:#222; border-radius:10px; overflow:hidden; transition:transform 0.3s ease; box-shadow:0 4px 8px rgba(0,0,0,0.3); cursor:pointer; }
+        .photo-card:hover { transform: translateY(-5px); }
+        .photo-card img { width:100%; height:200px; object-fit:cover; }
+
+        #imagePopup { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.9); display:none; align-items:center; justify-content:center; z-index:9999; }
+        #imagePopup img { max-width: 90%; max-height:90%; border-radius:10px; }
+        #closePopup { position:absolute; top:30px; right:40px; font-size:40px; color:white; cursor:pointer; font-weight:bold; }
+
+        .contact-link { display:flex; align-items:center; justify-content:center; gap:10px; font-size:1.2em; margin:10px 0; }
+        .contact-link i { color:#4CAF50; font-size:1.5em; cursor:pointer; }
+    </style>
+</head>
+<body>
+
+
+    <!-- NAVIGATION -->
+    <nav>
+        <button onclick="showSection('home', this)" class="active">Home</button>
+        <button onclick="showSection('about', this)">About</button>
+        <button onclick="showSection('skills', this)">Skills</button>
+        <button onclick="showSection('photos', this)">My Photos</button>
+        <button onclick="showSection('contact', this)">Contact Me</button>
+    </nav>
+
+    <!-- HOME -->
+    <section id="home">
+        <div class="hero-container">
+            <div class="avatar-container">
+                <img src="https://scontent-mnl3-3.xx.fbcdn.net/v/t39.30808-6/521697944_1944910899594406_5953379955214060513_n.jpg?stp=dst-jpg_s552x414_tt6&_nc_cat=108&ccb=1-7&_nc_sid=a5f93a&_nc_eui2=AeFXGPCd_jotRyin6XwPUKN60Ic6yikBtM_QhzrKKQG0z2FvYYLWfLgZMVlmQKcMXfPNGc7zDTC7u2xiAtPMMZ2c&_nc_ohc=OrkuXZ-lPC4Q7kNvwHX6qXs&_nc_oc=AdlKoR8C91jeCpbfIr0UEt8kW60HglBM8v0qPZ-6vEaKvT6ujpZqRrJlZ_2lKW_lZrY&_nc_zt=23&_nc_ht=scontent-mnl3-3.xx&_nc_gid=ZcIgs2a5xAMjAVqm8vSLPg&oh=00_Afm5vH_RyMFOPNpyTZze4dkBQzozPTIc5mRFEBV7IBHLKQ&oe=693DDA4C" alt="ricky Avatar" class="avatar">
+            </div>
+            <div class="name-title">Ricky Alonzo</div>
+            <div class="title-subtitle">Professional Portfolio</div>
+        </div>
+        <h1>Welcome to My Digital Showcase</h1>
+        <div class="intro-text">
+            Hello! I'm <strong>Ricky Alonzov</strong>. Explore my work, skills, and journey through this interactive portfolio.
+        </div>
+    </section>
+
+    <!-- ABOUT -->
+    <section id="about">
+        <h1>About</h1>
+        <img src="https://scontent-mnl3-3.xx.fbcdn.net/v/t39.30808-6/521697944_1944910899594406_5953379955214060513_n.jpg?stp=dst-jpg_s552x414_tt6&_nc_cat=108&ccb=1-7&_nc_sid=a5f93a&_nc_eui2=AeFXGPCd_jotRyin6XwPUKN60Ic6yikBtM_QhzrKKQG0z2FvYYLWfLgZMVlmQKcMXfPNGc7zDTC7u2xiAtPMMZ2c&_nc_ohc=OrkuXZ-lPC4Q7kNvwHX6qXs&_nc_oc=AdlKoR8C91jeCpbfIr0UEt8kW60HglBM8v0qPZ-6vEaKvT6ujpZqRrJlZ_2lKW_lZrY&_nc_zt=23&_nc_ht=scontent-mnl3-3.xx&_nc_gid=ZcIgs2a5xAMjAVqm8vSLPg&oh=00_Afm5vH_RyMFOPNpyTZze4dkBQzozPTIc5mRFEBV7IBHLKQ&oe=693DDA4C" alt="ricky Avatar" class="about-avatar" onclick="openPopup(this.src)">
+        <h2><span class="name-highlight">Ricky Alonzo</span></h2>
+        <p>I am a BSIS student passionate about technology, problem-solving, and creating meaningful digital experiences.</p>
+    </section>
+
+    <!-- SKILLS -->
+    <section id="skills">
+        <h1>Skills</h1>
+        <p>💻 Web Development — Responsive, modern, and creative website building.</p>
+        <p>⚙️ Problem Solving — Logical thinking and efficient solutions.</p>
+    </section>
+
+    <!-- PHOTOS -->
+    <section id="photos">
+        <h1>My Photos</h1>
+        <div class="photos-grid">
+            <div class="photo-card"><img src="https://scontent-mnl3-3.xx.fbcdn.net/v/t39.30808-6/481258817_1831707997581364_3864174962396362108_n.jpg?_nc_cat=101&ccb=1-7&_nc_sid=a5f93a&_nc_eui2=AeGZ-ssVFsWsAHEUBqLUgORN3kWSSRmPP5XeRZJJGY8_lYbetgksuIyl6CiZBNHjs1tOrVmOaDO81kdYXO2pE0TL&_nc_ohc=c8X-4CG9fVsQ7kNvwGVJmw_&_nc_oc=AdnFWE4gCZ79tQuEZoJrObeAEBzo5fVHLpzwqyoZekX0wM0rFh7YYmlWe6zdeIV7qD4&_nc_zt=23&_nc_ht=scontent-mnl3-3.xx&_nc_gid=vcog_8ZUHn1fsZlFxqycsQ&oh=00_AfkGWyZaRn0MDZEMajw_og0BT7tj8wI8UN65VdBAF4Kzxw&oe=693DF721"></div>
+            <div class="photo-card"><img src="https://scontent-mnl3-1.xx.fbcdn.net/v/t39.30808-6/481051242_1825491768202987_6132775875455485570_n.jpg?_nc_cat=103&ccb=1-7&_nc_sid=833d8c&_nc_eui2=AeFump0rrQJ-Hdjm6udEZoVLhu_8hq8A1QuG7_yGrwDVCzsoAMiZZuRseBCc58QPc9A-TSPIelUWou65xWdY6T0n&_nc_ohc=huWOJs83R_UQ7kNvwGoUfM2&_nc_oc=AdmpYgN6s5xh2Hb8NAfjlNdX-cDEPdBvCZrrkrnzUcMCm9jz6Wjy4XCP8DAgMT8-gdg&_nc_zt=23&_nc_ht=scontent-mnl3-1.xx&_nc_gid=H0_Xmg_ymqI6ulr3dPl8Wg&oh=00_AfkEijGacx9UDzbfmdkelOeY3OZdW1QNny9ZNAXsXj1pyg&oe=693DDE70"></div>
+            <div class="photo-card"><img src="https://scontent-mnl3-3.xx.fbcdn.net/v/t39.30808-6/480761905_1825474571538040_8058008522626753524_n.jpg?_nc_cat=101&ccb=1-7&_nc_sid=833d8c&_nc_eui2=AeEqnJX4_K75o0twt9Ssh9PJg8QuxNO2inODxC7E07aKc8frJDbn9JaLm8YdKL_J7Qxtdc44lMcWjls8eZCJA5xC&_nc_ohc=kpQ27H6M8EgQ7kNvwFNSraO&_nc_oc=AdlfJ4DylsXqSkAkB5snE2OkwLu8EtWnIrahof7NxHCryCkNzYU1kAWXIRoeCUID-IM&_nc_zt=23&_nc_ht=scontent-mnl3-3.xx&_nc_gid=RNWR93jrGtmqpUApl0isuA&oh=00_Afkco4DXxeOkfMlrmkSZ1BfO-TBve8jBEeDzsV9DG2oRxA&oe=693DEC1C"></div>
+            <div class="photo-card"><img src="https://scontent-mnl3-1.xx.fbcdn.net/v/t39.30808-6/476080253_1812002629551901_550245095449445706_n.jpg?_nc_cat=103&ccb=1-7&_nc_sid=a5f93a&_nc_eui2=AeHHvY4BjjXPHLtdkuanYuLYXUVM4v6jsYBdRUzi_qOxgCQ9B81ZWn4zAbR7nwfQhg6mAZT0SjnvEtsWCUwinUde&_nc_ohc=hY61tZMcfwMQ7kNvwFg3ylI&_nc_oc=Adm3PwtOHVFV3Gn0FudrYTcqMZeHNn0KPZzfMv5UzaLUc-BIdaTb3gm52fSz8lnEQZQ&_nc_zt=23&_nc_ht=scontent-mnl3-1.xx&_nc_gid=sPuduFh8WeeFjHyN82bZIg&oh=00_AfkGvo0pPfQQBNty6670s86h0hR8uWEGvs-BtqlCXgSMoQ&oe=693DDD9A"></div>
+        </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section id="contact">
+        <h1>Contact Me</h1>
+        <div class="contact-link"><a href="mailto:rickyalonzo30gmail.com"><i class="fas fa-envelope"></i> rickyalonzo30gmail.com</a></div>
+        <div class="contact-link"><a href="https://www.facebook.com/share/1BcZ4VkwNB/" target="_blank"><i class="fab fa-facebook-f"></i> Visit my Facebook</a></div>
+        <div class="contact-link"><a href="tel: 09922716351"><i class="fas fa-phone"></i> Call: 09922716351</a></div>
+    </section>
+
+    <!-- FULLSCREEN POPUP -->
+    <div id="imagePopup" onclick="closePopup()">
+        <span id="closePopup">×</span>
+        <img id="popupImg" src="">
+    </div>
+
+    <script>
+        const USERNAME = "admin";
+        const PASSWORD = "1234";
+
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const errorMsg = document.getElementById('loginError');
+
+            if(username === USERNAME && password === PASSWORD){
+                document.getElementById('loginScreen').style.display = "none";
+                showSection('home', document.querySelector('nav button'));
+            } else {
+                errorMsg.style.display = "block";
+            }
+        }
+
+        function showSection(id, btn) {
+            const sections = document.querySelectorAll('section');
+            sections.forEach(section => section.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+
+            const buttons = document.querySelectorAll('nav button');
+            buttons.forEach(button => button.classList.remove('active'));
+            btn.classList.add('active');
+        }
+
+        // Photos popup
+        document.querySelectorAll('.photo-card img').forEach(img => {
+            img.addEventListener('click', function() {
+                openPopup(this.src);
+            });
+        });
+
+        function openPopup(src) {
+            document.getElementById('popupImg').src = src;
+            document.getElementById('imagePopup').style.display = "flex";
+        }
+
+        function closePopup() {
+            document.getElementById('imagePopup').style.display = "none";
+        }
+    </script>
+</body>
+</html>
